@@ -51,13 +51,12 @@ module.exports = function(app,config) {
       setWorker(wrkr);
     }
 
-
     setInterval(function() {
       // repeatedly tell workers to give updates every second
       for (let id in cluster.workers) {
         cluster.workers[id].send({cmd: 'update'});
       }
-      
+
       if (workerData[0].data) {
           console.log('\033c');
           for (let i=0; i < workerData.length; i++) {
@@ -93,7 +92,6 @@ module.exports = function(app,config) {
 
         }
       }
-
     }, 1000);
 
       // When worker dies, remove it from workerData
