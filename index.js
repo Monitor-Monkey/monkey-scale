@@ -11,4 +11,4 @@ app.get('/', function(req,res) {
   res.send('<H1>Server</h1>');
 });
 
-const monkey = require('./monkey')(app, {threshold: 5, limit: 10});
+const monkey = require('./monkey')(app, {threshold: 4, limit: 10});

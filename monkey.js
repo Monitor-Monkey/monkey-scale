@@ -51,40 +51,54 @@ module.exports = function(app,config) {
       setWorker(wrkr);
     }
 
-
-    // repeatedly tell workers to give updates every second
     setInterval(function() {
+      // repeatedly tell workers to give updates every second
       for (let id in cluster.workers) {
         cluster.workers[id].send({cmd: 'update'});
       }
-      setTimeout(function() {
-        if (workerData[0].data) {
-            console.log('\033c');
-            for (let i=0; i < workerData.length; i++) {
-              try {
-                const id = workerData[i].id.toString();
-                let cpu = workerData[i].data.cpu;
-                let CPU = cpu.toString();
-                if (cpu >= 20) {
-                  console.log('Worker: ' + id.cyan + '   CPU usage: ' + CPU.red + '%'.red);
-                } else if ((cpu >= 10) && (cpu < 20)) {
-                  console.log('Worker: ' + id.cyan + '   CPU usage: ' + CPU.yellow + '%'.yellow);
-                } else {
-                  console.log('Worker: ' + id.cyan + '   CPU usage: ' + CPU.green + '%'.green);
+
+      if (workerData[0].data) {
+          console.log('\033c');
+          for (let i=0; i < workerData.length; i++) {
+
+            try {
+
+              const id = workerData[i].id.toString();
+              let cpu = workerData[i].data.cpu;
+              let CPU = cpu.toString();
+
+              if (cpu >= 20) {
+                console.log('Worker: ' + id.cyan + '   CPU usage: ' + CPU.red + '%'.red);
+                let wrkr = cluster.fork();
+                setWorker(wrkr);
+
+              } else if ((cpu >= 10) && (cpu < 20)) {
+                console.log('Worker: ' + id.cyan + '   CPU usage: ' + CPU.yellow + '%'.yellow);
+                let wrkr = cluster.fork();
+                setWorker(wrkr);
+
+              } else {
+                console.log('Worker: ' + id.cyan + '   CPU usage: ' + CPU.green + '%'.green);
+                if ((cpu === 0) && (workerData.length > minWorkers)) {
+                  console.log('Scaling down...'.yellow);
+                  workerData.splice(i,1);
+                 cluster.workers[id].send({cmd: 'kill'});
+
                 }
-              } catch (e) {
-                console.log('Worker DOWN!!'.red);
               }
-          }
+            } catch (e) {
+              console.log('Worker: ' + workerData[i].id.toString() + ' DOWN!!'.red);
+            }
+
         }
-      }, 1000);
+      }
     }, 1000);
 
       // When worker dies, remove it from workerData
       // Then check if number of workers is below threshold.
       // If so, spin up another one in its place..
       cluster.on('exit', (worker, code, signal) => {
-        console.log(`worker ${worker.process.pid} died`.red);
+        // console.log(`worker ${worker.process.pid} died`.red);
         const remWorkerData = new Promise(function(resolve) {
           for (let i = 0; i < workerData.length; i++) {
             if (workerData[i].id === worker.process.pid) {
@@ -121,6 +135,7 @@ module.exports = function(app,config) {
         // receive messages from master
         process.on('message', function(msg) {
           if (msg.cmd === 'update') {
+            // send data back to master
             usage.lookup(process.pid, function(err,res) {
               process.send({
                 id: process.pid,
@@ -128,6 +143,8 @@ module.exports = function(app,config) {
                 req: 'update'
               });
             });
+          } else if (msg.cmd === 'kill') {
+            process.kill();
           } else {
             overview = msg;
           }
@@ -142,7 +159,7 @@ module.exports = function(app,config) {
             if (overview.length > 0) {
               resolve(overview);
             } else {
-              reject('not updated');
+              reject('updating...');
             }
           });
 
