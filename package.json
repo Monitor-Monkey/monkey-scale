@@ -1,0 +1,28 @@
+{
+  "name": "autoscale",
+  "version": "0.0.1",
+  "description": "auto scale node clustering",
+  "preferGlobal": true,
+  "keywords": [
+    "auto",
+    "scale",
+    "cluster",
+    "node"
+  ],
+  "bin": {
+    "monkey": "node index.js"
+  },
+  "author": "grady rogers",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cluster": "^0.7.7",
+    "colors": "^1.1.2",
+    "express": "^4.14.0",
+    "os": "^0.1.1",
+    "os-monitor": "^1.0.5",
+    "path": "^0.12.7",
+    "socket.io": "^1.7.1",
+    "usage": "^0.7.1"
+  }
+}
