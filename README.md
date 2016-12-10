@@ -1,6 +1,6 @@
 # monkey-scale
 
-Automatically scale you node clusters up and down. Also monitor your cluster's performance.
+Automatically scale your node clusters up and down. Also monitor your cluster's performance.
 
 ``` bash
 
