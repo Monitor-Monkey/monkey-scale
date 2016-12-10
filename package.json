@@ -1,16 +1,19 @@
 {
-  "name": "autoscale",
-  "version": "0.0.1",
+  "name": "monkey-scale",
+  "version": "0.0.6",
   "description": "auto scale node clustering",
-  "preferGlobal": true,
+  "main": "monkey-scale.js",
   "keywords": [
     "auto",
     "scale",
     "cluster",
     "node"
   ],
-  "bin": {
-    "monkey": "node index.js"
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Monitor-Monkey/monkey-scale"
   },
   "author": "grady rogers",
   "license": "ISC",
